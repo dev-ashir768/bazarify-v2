@@ -31,8 +31,7 @@ const ProductCard = ({
     <>
       <div className="flex flex-col gap-3">
         <Link
-          href={shopify_url}
-          target="_blank"
+          href={`/product/${sku}`}
           className="relative w-full aspect-square bg-card rounded-2xl overflow-hidden"
         >
           <ImageFallback
@@ -50,8 +49,7 @@ const ProductCard = ({
         </Link>
         <div className="px-2">
           <Link
-            href={shopify_url}
-            target="_blank"
+            href={`/products/${sku}`}
             className="text-sm text-muted-foreground mb-1 capitalize line-clamp-2"
           >
             {productname}

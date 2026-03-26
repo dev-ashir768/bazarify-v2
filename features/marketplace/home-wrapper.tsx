@@ -4,6 +4,7 @@ import HomeHero from "./home-hero";
 
 const products = [
   {
+    id: 1,
     productname: "Wireless Noise Cancelling Headphones",
     variation_price: "100",
     sku: "SKU001",
@@ -13,6 +14,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 2,
     productname: "Smart Fitness Watch Pro",
     variation_price: "120",
     sku: "SKU002",
@@ -22,6 +24,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 3,
     productname: "Portable Bluetooth Speaker",
     variation_price: "150",
     sku: "SKU003",
@@ -31,6 +34,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 4,
     productname: "Ultra HD 4K Action Camera",
     variation_price: "200",
     sku: "SKU004",
@@ -40,6 +44,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 5,
     productname: "Ergonomic Office Chair",
     variation_price: "180",
     sku: "SKU005",
@@ -49,6 +54,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 6,
     productname: "Gaming Mechanical Keyboard RGB",
     variation_price: "90",
     sku: "SKU006",
@@ -58,6 +64,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 7,
     productname: "Wireless Gaming Mouse",
     variation_price: "110",
     sku: "SKU007",
@@ -67,6 +74,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 8,
     productname: "LED Ring Light Kit",
     variation_price: "130",
     sku: "SKU008",
@@ -76,6 +84,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 9,
     productname: "Adjustable Laptop Stand",
     variation_price: "170",
     sku: "SKU009",
@@ -85,6 +94,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 10,
     productname: "Fast Charging Power Bank 20000mAh",
     variation_price: "210",
     sku: "SKU010",
@@ -94,6 +104,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 11,
     productname: "Smart Home WiFi Camera",
     variation_price: "95",
     sku: "SKU011",
@@ -103,6 +114,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 12,
     productname: "Noise Isolating Earbuds",
     variation_price: "140",
     sku: "SKU012",
@@ -112,6 +124,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 13,
     productname: "Adjustable Dumbbell Set",
     variation_price: "160",
     sku: "SKU013",
@@ -121,6 +134,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 14,
     productname: "Electric Kettle Stainless Steel",
     variation_price: "220",
     sku: "SKU014",
@@ -130,6 +144,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 15,
     productname: "Air Fryer Digital 5L",
     variation_price: "175",
     sku: "SKU015",
@@ -139,6 +154,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 16,
     productname: "Cordless Vacuum Cleaner",
     variation_price: "105",
     sku: "SKU016",
@@ -148,6 +164,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 17,
     productname: "Smart LED Light Bulb",
     variation_price: "115",
     sku: "SKU017",
@@ -157,6 +174,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 18,
     productname: "Digital Alarm Clock with LED Display",
     variation_price: "135",
     sku: "SKU018",
@@ -166,6 +184,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 19,
     productname: "Mini Projector HD Portable",
     variation_price: "155",
     sku: "SKU019",
@@ -175,6 +194,7 @@ const products = [
     baseUrl: "https://example.com",
   },
   {
+    id: 20,
     productname: "USB-C Multiport Adapter",
     variation_price: "250",
     sku: "SKU020",
@@ -184,7 +204,6 @@ const products = [
     baseUrl: "https://example.com",
   },
 ];
-
 const HomeWrapper = () => {
   return (
     <>
@@ -195,7 +214,7 @@ const HomeWrapper = () => {
       <section className="container pb-20">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-8">
           {products.map((item) => (
-            <ProductCard key={item.sku} {...item} />
+            <ProductCard key={item.id} {...item} />
           ))}
         </div>
       </section>
