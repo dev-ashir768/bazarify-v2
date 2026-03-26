@@ -47,14 +47,14 @@ const HomeHero = () => {
   return (
     <>
       <div
-        className="relative w-full flex items-baseline-last overflow-hidden bg-cover bg-center min-h-[400px] pb-8"
+        className="relative w-full flex items-baseline-last overflow-hidden bg-cover bg-center min-h-[400px] pb-8 pt-[86px]"
         style={{ backgroundImage: "url('/images/marketplace-bg2.jpg')" }}
       >
          <motion.div
           variants={bgRightVariant}
           initial="hidden"
           animate="visible"
-          className="absolute -right-20 bottom-0 w-[220px] h-[320px] bg-no-repeat bg-contain"
+          className="absolute -right-20 bottom-0 w-[140px] md:w-[180px] lg:w-[220px] h-[320px] bg-no-repeat bg-contain"
           style={{
             backgroundImage: "url('/images/bg-element-two.png')",
             backgroundPosition: "bottom right",
@@ -65,7 +65,7 @@ const HomeHero = () => {
           variants={bgLeftVariant}
           initial="hidden"
           animate="visible"
-          className="absolute -left-12 bottom-0 w-[220px] h-[320px] bg-no-repeat bg-contain"
+          className="absolute -left-12 bottom-0 w-[140px] md:w-[180px] lg:w-[220px] h-[320px] bg-no-repeat bg-contain"
           style={{
             backgroundImage: "url('/images/bg-element-one.png')",
             backgroundPosition: "bottom left",
@@ -78,16 +78,16 @@ const HomeHero = () => {
               variants={containerVariant}
               initial="hidden"
               animate="visible"
-              className="lg:w-[70%] w-full px-4"
+              className="lg:w-[80%] xl:w-[70%] w-full"
             >
               <motion.div variants={itemVariant} className="text-center mb-5">
-                <h1 className="text-midnight font-bold lg:text-5xl text-4xl tracking-wide">
+                <h1 className="text-midnight font-bold md:text-5xl text-4xl tracking-wide">
                   Welcome to the Marketplace
                 </h1>
               </motion.div>
               
-              <motion.div variants={itemVariant} className="max-w-[850px] text-center mx-auto mb-10">
-                <p className="text-muted-foreground font-normal text-base leading-relaxed">
+              <motion.div variants={itemVariant} className="max-w-[530px] lg:max-w-[850px] text-center mx-auto mb-10">
+                <p className="text-muted-foreground font-normal text-sm sm:text-base leading-relaxed">
                   Your one-stop destination for everything you need. Discover
                   thousands of products, unbeatable deals, and a seamless
                   shopping experience all in one place.

@@ -12,7 +12,7 @@ const categories = [
   { id: 5, name: "Shoes", slug: "shoes" },
   { id: 6, name: "Food & Drinks", slug: "food-drinks" },
   { id: 7, name: "Home Appliances", slug: "home-appliances" },
-  // { id: 8, name: "Others", slug: "others" },
+  { id: 8, name: "Others", slug: "others" },
 ];
 
 const containerVariants: Variants = {
@@ -37,16 +37,17 @@ const itemVariants: Variants = {
 
 const CategoryFilters = () => {
   return (
-    <motion.div
-      className="container flex items-center gap-6 justify-center flex-wrap"
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
-    >
+    <div className="w-full overflow-hidden">
+      <motion.div
+        className="container flex items-center justify-start sm:justify-center gap-3 sm:gap-6 overflow-x-auto no-scrollbar pb-2 sm:pb-0 flex-nowrap sm:flex-wrap"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
       {categories.map((category) => (
         <motion.div key={category.id} variants={itemVariants}>
-          <Button size="pill" variant="filter">
+          <Button size="pill" variant="filter" className="2xl:mb-2">
             {category.name}
           </Button>
         </motion.div>
@@ -55,6 +56,7 @@ const CategoryFilters = () => {
         <PriceFilter />
       </motion.div>
     </motion.div>
+    </div>
   );
 };
 

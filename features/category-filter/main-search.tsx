@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React from "react";
 
 const MainSearch = () => {
   return (
     <>
       <div
-        className="w-[60%] h-16 mx-auto bg-white rounded-full flex justify-center items-center py-3 pl-8 pr-3 mb-1"
+        className="w-[90%] md:w-[60%] h-16 mx-auto bg-background rounded-full flex justify-center items-center py-3 pl-8 pr-3 mb-1"
         style={{ boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px" }}
       >
         <Input
