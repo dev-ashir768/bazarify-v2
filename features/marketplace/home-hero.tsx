@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
-import MainSearch from "./main-search";
+import MainSearch from "../category-filter/main-search";
 
 const containerVariant: Variants = {
   hidden: { opacity: 0 },
@@ -46,7 +46,7 @@ const bgRightVariant: Variants = {
 const HomeHero = () => {
   return (
     <>
-      <section
+      <div
         className="relative w-full flex items-baseline-last overflow-hidden bg-cover bg-center min-h-[400px] pb-8"
         style={{ backgroundImage: "url('/images/marketplace-bg2.jpg')" }}
       >
@@ -73,7 +73,7 @@ const HomeHero = () => {
         />
 
         <div className="relative z-10 w-full">
-          <div className="container px-6 mx-auto flex lg:flex-row flex-col justify-center lg:items-center">
+          <div className="container flex lg:flex-row flex-col justify-center lg:items-center">
             <motion.div
               variants={containerVariant}
               initial="hidden"
@@ -100,7 +100,7 @@ const HomeHero = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </div>
     </>
   );
 };

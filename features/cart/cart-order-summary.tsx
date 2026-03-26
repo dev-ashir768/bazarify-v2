@@ -1,10 +1,24 @@
 "use client";
 
+import { motion, Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
+const cartItemVariants: Variants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { type: "spring", stiffness: 100, damping: 15 } 
+  }
+};
+
 const CartItem = () => (
-  <div className="grid grid-cols-12 bg-background rounded-xl sm:rounded-2xl p-4 sm:p-6 gap-y-2 xs:gap-y-0">
+  <motion.div 
+    variants={cartItemVariants}
+    className="grid grid-cols-12 bg-background rounded-xl sm:rounded-2xl p-4 sm:p-6 gap-y-2 xs:gap-y-0"
+  >
     <div className="col-span-12 xs:col-span-8 flex flex-col xs:flex-row items-start sm:items-center gap-2 xs:gap-4">
       <div className="size-15 bg-card rounded-lg shrink-0"></div>
       <div className="mt-0.5">
@@ -85,7 +99,7 @@ const CartItem = () => (
         </svg>
       </Button>
     </div>
-  </div>
+  </motion.div>
 );
 
 const CartOrderSummary = () => {
@@ -117,7 +131,7 @@ const CartOrderSummary = () => {
           </div>
         </div>
 
-        <div className="border-t pt-4 flex justify-between items-center font-semibold text-base text-muted-foreground">
+        <div className="border-t pt-4 flex justify-between items-center font-bold text-base text-foreground">
           <span>Total</span>
           <span className="font-semibold text-foreground">Rs. 5,650</span>
         </div>

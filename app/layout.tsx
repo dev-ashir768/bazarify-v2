@@ -7,8 +7,13 @@ import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 
 export const metadata: Metadata = {
-  title: "Bazarify by Orio",
+  title: {
+    default: "Bazarify by Orio",
+    template: "%s | Bazarify by Orio",
+  },
   description: "Bazarify is a marketplace for everything",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL!),
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({
