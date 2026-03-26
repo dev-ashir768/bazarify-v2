@@ -37,7 +37,7 @@ const itemVariants: Variants = {
 
 const CategoryFilters = () => {
   return (
-    <motion.div 
+    <motion.div
       className="container flex items-center gap-6 justify-center flex-wrap"
       variants={containerVariants}
       initial="hidden"
@@ -46,12 +46,7 @@ const CategoryFilters = () => {
     >
       {categories.map((category) => (
         <motion.div key={category.id} variants={itemVariants}>
-          <Button
-            size="lg"
-            variant="secondary"
-            className="rounded-full bg-white! hover:bg-white! h-12 px-8 text-sm border-gray-200"
-            style={{boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px"}}
-          >
+          <Button size="pill" variant="filter">
             {category.name}
           </Button>
         </motion.div>

@@ -33,7 +33,7 @@ const ProductCard = ({
         <Link
           href={shopify_url}
           target="_blank"
-          className="relative w-full aspect-square bg-[#F6F6F6] rounded-xl overflow-hidden"
+          className="relative w-full aspect-square bg-card rounded-2xl overflow-hidden"
         >
           <ImageFallback
             key={sku}
@@ -52,18 +52,18 @@ const ProductCard = ({
           <Link
             href={shopify_url}
             target="_blank"
-            className="text-sm text-charcoal mb-1 capitalize line-clamp-2"
+            className="text-sm text-muted-foreground mb-1 capitalize line-clamp-2"
           >
             {productname}
           </Link>
           <Link
             href={baseUrl}
             target="_blank"
-            className="font-normal text-[15px] text-charcoal capitalize underline hover:text-primary transition-colors"
+            className="text-base text-muted-foreground mb-1 capitalize line-clamp-2 underline underline-offset-2"
           >
             {brandname}
           </Link>
-          <p className="font-bold text-[17px] text-[#000C19]">
+          <p className="font-bold text-[17px] text-foreground">
             Rs. {variation_price}
           </p>
         </div>

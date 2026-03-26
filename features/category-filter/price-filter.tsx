@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 
 const PriceFilter = () => {
@@ -40,23 +41,21 @@ const PriceFilter = () => {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          size="lg"
-          variant="secondary"
-          className="rounded-full bg-white! hover:bg-white! h-12 px-8 text-sm border-gray-200"
-          style={{ boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px" }}
+          size="pill"
+          variant="filter"
         >
           Price
-          <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          <svg className={cn("ml-2 w-4 h-4 transition-transform duration-200", isOpen ? "rotate-180" : "")} fill="none" stroke="var(--muted-foreground)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
         </Button>
       </DropdownMenuTrigger>
       
       <DropdownMenuContent 
-        className="w-[340px] p-6 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border-gray-100" 
+        className="w-[340px] bg-background p-5 rounded-3xl shadow-[0px_5px_15px_rgba(0,0,0,0.35)]! ring-0" 
         align="end"
       >
         <div className="flex flex-col space-y-6">
           {/* Slider */}
-          <div className="px-2 pt-4">
+          <div className="pt-4">
             <Slider
               defaultValue={[0, 5000]}
               max={10000}
@@ -72,13 +71,13 @@ const PriceFilter = () => {
             <Input
               value={values[0]}
               onChange={handleMinChange}
-              className="h-12 text-center text-base rounded-xl border-gray-200 bg-white"
+              className="h-12 text-center text-base rounded-xl border bg-background"
             />
-            <span className="text-gray-500 font-medium">to</span>
+            <span className="text-muted-foreground font-medium">to</span>
             <Input
               value={values[1].toLocaleString()}
               onChange={handleMaxChange}
-              className="h-12 text-center text-base rounded-xl border-gray-200 bg-white"
+              className="h-12 text-center text-base rounded-xl border bg-background"
             />
           </div>
 
