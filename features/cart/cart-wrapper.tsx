@@ -36,7 +36,7 @@ const rightColumnVariants: Variants = {
 const CartWrapper = () => {
   return (
     <motion.section 
-      className="container py-24 overflow-hidden"
+      className="container pb-8 pt-[96px] overflow-hidden"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

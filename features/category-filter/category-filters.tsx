@@ -2,60 +2,85 @@
 
 import { Button } from "@/components/ui/button";
 import PriceFilter from "./price-filter";
-import { motion, Variants } from "framer-motion";
-
-const categories = [
-  { id: 1, name: "Men", slug: "men" },
-  { id: 2, name: "Women", slug: "women" },
-  { id: 3, name: "Accessories", slug: "accessories" },
-  { id: 4, name: "Beauty", slug: "beauty" },
-  { id: 5, name: "Shoes", slug: "shoes" },
-  { id: 6, name: "Food & Drinks", slug: "food-drinks" },
-  { id: 7, name: "Home Appliances", slug: "home-appliances" },
-  { id: 8, name: "Others", slug: "others" },
-];
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.3,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 100, damping: 15 },
-  },
-};
+import { useCategoryHooks } from "@/hooks/useCategoryHooks";
+import { LoadingSkeleton } from "@/components/shared/loading-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { useCallback } from "react";
 
 const CategoryFilters = () => {
+  // ========================= Hooks ========================= \\
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const activeCategory = searchParams.get("category");
+
+  // ========================= Data Fetching ========================= \\
+  const {
+    data: categories,
+    isLoading,
+    isError,
+    refetch,
+  } = useCategoryHooks.getList();
+
+  // ========================= Handler ========================= \\
+  const handleFilter = useCallback(
+    (category: string) => {
+      const params = new URLSearchParams(searchParams);
+      const lowerCategory = category.toLowerCase();
+
+      if (activeCategory === lowerCategory) {
+        params.delete("category");
+      } else {
+        params.set("category", lowerCategory);
+      }
+
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, activeCategory, pathname, router],
+  );
+
+  // ========================= Render ========================= \\
+  if (isLoading) return <LoadingSkeleton.CategorySkeleton />;
+
+  if (isError)
+    return (
+      <div className="col-span-full py-10">
+        <ErrorState
+          onRetry={() => refetch()}
+          message="We couldn't load the categories. Please try again later."
+        />
+      </div>
+    );
+
   return (
     <div className="w-full overflow-hidden">
-      <motion.div
-        className="container flex items-center justify-start sm:justify-center gap-3 sm:gap-6 overflow-x-auto no-scrollbar pb-2 sm:pb-0 flex-nowrap sm:flex-wrap"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-      >
-      {categories.map((category) => (
-        <motion.div key={category.id} variants={itemVariants}>
-          <Button size="pill" variant="filter" className="2xl:mb-2">
-            {category.name}
-          </Button>
-        </motion.div>
-      ))}
-      <motion.div variants={itemVariants}>
-        <PriceFilter />
-      </motion.div>
-    </motion.div>
+      <div className="container flex items-center justify-start sm:justify-center gap-3 sm:gap-6 overflow-x-auto no-scrollbar pb-2 sm:pb-0 flex-nowrap sm:flex-wrap">
+        {categories?.payload?.map((category) => {
+          const isSelected = activeCategory === category.name.toLowerCase();
+
+          return (
+            <div key={category.id}>
+              <Button
+                size="pill"
+                variant="filter"
+                className={cn(
+                  "2xl:mb-2",
+                  isSelected &&
+                    "bg-primary text-primary-foreground hover:bg-primary/80",
+                )}
+                onClick={() => handleFilter(category.name)}
+              >
+                {category.name}
+              </Button>
+            </div>
+          );
+        })}
+        <div>
+          <PriceFilter />
+        </div>
+      </div>
     </div>
   );
 };

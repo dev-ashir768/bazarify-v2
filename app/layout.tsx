@@ -5,6 +5,7 @@ import Providers from "@/providers";
 import { sora } from "./fonts";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: {
@@ -29,6 +30,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col justify-between">
         <Providers>
+          <NextTopLoader color="var(--primary)" showSpinner={false} />
           <Navbar />
           {children}
           <Footer />

@@ -9,11 +9,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 
 const PriceFilter = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [values, setValues] = useState([0, 5000]);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleSliderChange = (newValues: number[]) => {
     setValues(newValues);
@@ -31,31 +35,52 @@ const PriceFilter = () => {
 
   const handleReset = () => {
     setValues([0, 5000]);
+    const params = new URLSearchParams(searchParams);
+    params.delete("minPrice");
+    params.delete("maxPrice");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handleDone = () => {
     setIsOpen(false);
+    const params = new URLSearchParams(searchParams);
+    params.set("minPrice", values[0].toString());
+    params.set("maxPrice", values[1].toString());
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button
-          size="pill"
-          variant="filter"
-        >
+        <Button size="pill" variant="filter" className="2xl:mb-2">
           Price
-          <svg className={cn("ml-2 w-4 h-4 transition-transform duration-200", isOpen ? "rotate-180" : "")} fill="none" stroke="var(--muted-foreground)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          <svg
+            className={cn(
+              "ml-2 w-4 h-4 transition-transform duration-200",
+              isOpen ? "rotate-180" : "",
+            )}
+            fill="none"
+            stroke="var(--muted-foreground)"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
         </Button>
       </DropdownMenuTrigger>
-      
-      <DropdownMenuContent 
-        className="w-[340px] bg-background p-5 rounded-3xl shadow-[0px_5px_15px_rgba(0,0,0,0.35)]! ring-0" 
+
+      <DropdownMenuContent
+        className="w-[340px] bg-background p-5 rounded-3xl shadow-[0px_5px_15px_rgba(0,0,0,0.35)]! ring-0"
         align="end"
       >
-        <div className="flex flex-col space-y-6">
+        <div className="flex flex-col">
           {/* Slider */}
-          <div className="pt-4">
+          <div className="pt-4 mb-8">
             <Slider
               defaultValue={[0, 5000]}
               max={10000}
@@ -67,7 +92,7 @@ const PriceFilter = () => {
           </div>
 
           {/* Inputs */}
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 mb-4">
             <Input
               value={values[0]}
               onChange={handleMinChange}
