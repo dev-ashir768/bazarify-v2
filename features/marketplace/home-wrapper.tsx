@@ -6,9 +6,12 @@ import ProductCard from "../products/product-card";
 import HomeHero from "./home-hero";
 import { useProductHooks } from "@/hooks/useProductHooks";
 import { ErrorState } from "@/components/shared/error-state";
+import { RiAlertLine, RiLoader4Line } from "@remixicon/react";
+import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 import { useCategoryHooks } from "@/hooks/useCategoryHooks";
 import { GetProductsListParams } from "@/types";
+import { useEffect, useRef } from "react";
 
 const HomeWrapper = () => {
   // ========================= URL Params ========================= \\
@@ -40,13 +43,41 @@ const HomeWrapper = () => {
     isLoading: productsLoading,
     isError: productsIsError,
     refetch: productsRefetch,
-  } = useProductHooks.GetList(data);
-  
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useProductHooks.GetInfiniteList(data);
+
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 },
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const allProducts = products?.pages.flatMap((page) => page.payload) || [];
+
   // ========================= Price Bounds ========================= \\
-  const productPrices = products?.payload?.map((p) => Number(p.on_sale === "Y" ? p.sale_price : p.price)).filter((p) => !isNaN(p)) || [];
-    
+  const productPrices =
+    allProducts
+      ?.map((p: any) => Number(p.on_sale === "Y" ? p.sale_price : p.price))
+      .filter((p: any) => !isNaN(p)) || [];
+
   const minBound = productPrices.length > 0 ? Math.min(...productPrices) : 0;
-  const maxBound = productPrices.length > 0 ? Math.max(...productPrices) : 10000;
+  const maxBound =
+    productPrices.length > 0 ? Math.max(...productPrices) : 10000;
 
   // ========================= Render ========================= \\
   const isLoading = categoriesLoading || productsLoading;
@@ -69,7 +100,7 @@ const HomeWrapper = () => {
         </div>
       );
 
-    if (products?.payload?.length === 0) {
+    if (allProducts.length === 0) {
       return (
         <div className="col-span-full py-10">
           <ErrorState
@@ -80,9 +111,7 @@ const HomeWrapper = () => {
       );
     }
 
-    return products?.payload?.map((item) => (
-      <ProductCard key={item.id} {...item} />
-    ));
+    return allProducts.map((item) => <ProductCard key={item.id} {...item} />);
   };
 
   return (
@@ -94,7 +123,28 @@ const HomeWrapper = () => {
       <section className="container pb-20">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-8">
           {renderProductCards()}
+          {isFetchingNextPage &&
+            Array.from({ length: 5 }).map((_, i) => (
+              <LoadingSkeleton.ProductCardSkeleton key={`next-${i}`} />
+            ))}
         </div>
+
+        <div ref={observerTarget} className="flex justify-center pt-8 w-full">
+          {isFetchingNextPage && (
+            <div className="flex flex-col items-center gap-2">
+              <RiLoader4Line className="animate-spin text-primary" size={32} />
+              <p className="text-sm text-muted-foreground font-medium">
+                Loading more products...
+              </p>
+            </div>
+          )}
+        </div>
+
+        {!hasNextPage && allProducts.length > 0 && (
+          <p className="text-center text-muted-foreground mt-8">
+            No more products to show
+          </p>
+        )}
       </section>
     </>
   );

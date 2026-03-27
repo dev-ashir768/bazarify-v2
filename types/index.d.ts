@@ -30,4 +30,6 @@ export interface GetProductsListParams {
   categoryId?: [number];
   maxPrice?: number;
   minPrice?: number;
+  limit?: number;
+  offset?: number;
 }

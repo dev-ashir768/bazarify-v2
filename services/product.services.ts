@@ -8,8 +8,8 @@ export const ProductServices = {
       marketplaceApi,
       API_ENDPOINTS.PRODUCTS,
       {
-        limit: 100,
-        offset: 0,
+        limit: data.limit ?? 20,
+        offset: data.offset ?? 0,
         ...(data.categoryId && { marketplace_category_id: data.categoryId }),
         ...(data.minPrice !== undefined && { min_price: data.minPrice }),
         ...(data.maxPrice !== undefined && { max_price: data.maxPrice }),
