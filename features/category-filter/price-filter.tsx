@@ -10,12 +10,31 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const PriceFilter = () => {
+interface PriceFilterProps {
+  minBound: number;
+  maxBound: number;
+}
+
+const PriceFilter = ({ minBound, maxBound }: PriceFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [values, setValues] = useState([0, 5000]);
+  const [values, setValues] = useState([minBound, maxBound]);
   const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    const minParam = searchParams.get("minPrice");
+    const maxParam = searchParams.get("maxPrice");
+
+    if (minParam !== null || maxParam !== null) {
+      setValues([
+        minParam !== null ? Number(minParam) : minBound,
+        maxParam !== null ? Number(maxParam) : maxBound,
+      ]);
+    } else {
+      setValues([minBound, maxBound]);
+    }
+  }, [searchParams, minBound, maxBound]);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -34,7 +53,7 @@ const PriceFilter = () => {
   };
 
   const handleReset = () => {
-    setValues([0, 5000]);
+    setValues([minBound, maxBound]);
     const params = new URLSearchParams(searchParams);
     params.delete("minPrice");
     params.delete("maxPrice");
@@ -82,9 +101,9 @@ const PriceFilter = () => {
           {/* Slider */}
           <div className="pt-4 mb-8">
             <Slider
-              defaultValue={[0, 5000]}
-              max={10000}
-              step={100}
+              min={minBound}
+              max={maxBound}
+              step={10}
               value={values}
               onValueChange={handleSliderChange}
               className="w-full"

@@ -9,7 +9,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useCallback } from "react";
 
-const CategoryFilters = () => {
+interface CategoryFiltersProps {
+  minBound: number;
+  maxBound: number;
+}
+
+const CategoryFilters = ({ minBound, maxBound }: CategoryFiltersProps) => {
   // ========================= Hooks ========================= \\
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -78,7 +83,7 @@ const CategoryFilters = () => {
           );
         })}
         <div>
-          <PriceFilter />
+          <PriceFilter minBound={minBound} maxBound={maxBound} />
         </div>
       </div>
     </div>
