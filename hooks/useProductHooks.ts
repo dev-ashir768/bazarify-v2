@@ -1,12 +1,12 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/constants";
 import { ProductServices } from "@/services/product.services";
-import { GetProductsListParams } from "@/types";
+import { GetProductDetailParams, GetProductsListParams } from "@/types";
 
 export const useProductHooks = {
-  GetInfiniteList: (data: GetProductsListParams) => {
+  GetList: (data: GetProductsListParams) => {
     return useInfiniteQuery({
       queryKey: [
         QUERY_KEYS.PRODUCTS_LISTING,
@@ -26,6 +26,13 @@ export const useProductHooks = {
         if (payload.length < 20) return undefined;
         return allPages.length * 20;
       },
+    });
+  },
+  GetDetail: (data: GetProductDetailParams) => {
+    return useQuery({
+      queryKey: [QUERY_KEYS.PRODUCT_DETAIL, data.acno, data.product_id],
+      queryFn: () => ProductServices.getProductDetail(data),
+      enabled: !!data.acno && !!data.product_id,
     });
   },
 };

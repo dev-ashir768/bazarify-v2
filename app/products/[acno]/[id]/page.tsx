@@ -5,11 +5,16 @@ export const metadata: Metadata = {
   title: "Product Detail",
 };
 
-const page = async ({ params }: { params: Promise<{ id: string }> }) => {
-  const { id } = await params;
+interface PageProps {
+  params: Promise<{ id: string; acno: string }>;
+}
+
+const page = async ({ params }: PageProps) => {
+  const { id, acno } = await params;
+
   return (
     <>
-      <ProductDetailWrapper productId={id} />
+      <ProductDetailWrapper productId={Number(id)} acno={acno} />
     </>
   );
 };

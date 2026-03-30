@@ -4,6 +4,7 @@ import { motion, Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
+// ========================= Motion ========================= \\
 const cartItemVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.95 },
   visible: { 

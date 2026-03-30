@@ -1,6 +1,6 @@
 "use client";
 
-import { RiAlertLine, RiRefreshLine } from "@remixicon/react";
+import { RiAlertLine } from "@remixicon/react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 

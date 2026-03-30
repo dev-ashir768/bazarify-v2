@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import ReactSelect, { Props as SelectProps, StylesConfig } from "react-select";
 import { Label } from "./label";
 
@@ -10,17 +10,13 @@ export interface FloatingSelectProps extends SelectProps {
 
 export const FloatingSelect = ({ label, ...props }: FloatingSelectProps) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [hasValue, setHasValue] = useState(false);
-
-  useEffect(() => {
-    if (props.value !== undefined && props.value !== null) {
-      if (Array.isArray(props.value)) {
-        setHasValue(props.value.length > 0);
-      } else {
-        setHasValue(Object.keys(props.value).length > 0);
-      }
-    }
-  }, [props.value]);
+  const hasValue =
+    !!props.value &&
+    (Array.isArray(props.value)
+      ? props.value.length > 0
+      : typeof props.value === "string"
+        ? props.value.length > 0
+        : typeof props.value === "object" && Object.keys(props.value).length > 0);
 
   const isFloated = isFocused || hasValue;
 
@@ -125,13 +121,6 @@ export const FloatingSelect = ({ label, ...props }: FloatingSelectProps) => {
           props.onBlur?.(e);
         }}
         onChange={(val, actionMeta) => {
-          if (val && !Array.isArray(val) && Object.keys(val).length > 0) {
-            setHasValue(true);
-          } else if (Array.isArray(val) && val.length > 0) {
-            setHasValue(true);
-          } else {
-            setHasValue(false);
-          }
           props.onChange?.(val, actionMeta);
         }}
         placeholder=""

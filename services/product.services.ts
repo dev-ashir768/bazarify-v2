@@ -1,6 +1,11 @@
 import { apiPost, marketplaceApi } from "@/lib/axios";
 import { API_ENDPOINTS } from "@/lib/constants";
-import { GetProductsListParams, ProductListResponse } from "@/types";
+import {
+  GetProductDetailParams,
+  GetProductsListParams,
+  ProductDetailResponse,
+  ProductListResponse,
+} from "@/types";
 
 export const ProductServices = {
   getProductsByCategory: (data: GetProductsListParams) => {
@@ -14,6 +19,14 @@ export const ProductServices = {
         ...(data.minPrice !== undefined && { min_price: data.minPrice }),
         ...(data.maxPrice !== undefined && { max_price: data.maxPrice }),
       },
+    );
+    return response;
+  },
+  getProductDetail: (data: GetProductDetailParams) => {
+    const response = apiPost<ProductDetailResponse>(
+      marketplaceApi,
+      API_ENDPOINTS.PRODUCT_DETAIL,
+      data,
     );
     return response;
   },

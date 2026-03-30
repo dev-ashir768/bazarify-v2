@@ -11,15 +11,18 @@ export const STORAGE_KEYS = {
 
 export const PUBLIC_ROUTES = {
   HOME: "/",
-  PRODUCTS: "/products/:id",
+  PRODUCTS: "/products/:acno/:id",
+  CART: "/cart",
 } as const;
 
 export const API_ENDPOINTS = {
   CATEGORIES: "/marketplace/category",
   PRODUCTS: "/marketplace/getproducts",
+  PRODUCT_DETAIL: "/marketplace/productdetail",
 } as const;
 
 export const QUERY_KEYS = {
   CATEGORIES_LISTING: "categories-listing",
   PRODUCTS_LISTING: "products-listing",
+  PRODUCT_DETAIL: "product-detail",
 } as const;

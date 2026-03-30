@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,69 +13,43 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { motion, Variants } from "framer-motion";
 import ImageFallback from "@/lib/image-fallback";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { PUBLIC_ROUTES } from "@/lib/constants";
+import { useProductHooks } from "@/hooks/useProductHooks";
+import ProductDetailSkeleton from "@/components/shared/product-detail-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
+import { Lens } from "@/components/ui/lens";
+import { FloatingSelect } from "@/components/ui/floating-select";
+import { ProductInventory, ProductVariation } from "@/types";
+import { formattedAmount } from "@/lib/formated-amount";
 
-const product = {
-  id: "hp-laptop-sku-1",
-  name: "Men Stainless Steel Neck Chains",
-  price: 4976.0,
-  store: "Tiara",
-  availability: "In stock",
-  images: [
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-    "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-wooden-table-6RqSDGaNJ5c",
-  ],
-};
+interface ProductDetailProps {
+  productId: number;
+  acno: string;
+}
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
-  },
-};
-
-const ProductDetail = ({ productId }: { productId: string }) => {
+const ProductDetail = ({ productId, acno }: ProductDetailProps) => {
+  // ========================= Hooks ========================= \\
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >({});
   const [mainApi, setMainApi] = useState<CarouselApi>();
   const [thumbApi, setThumbApi] = useState<CarouselApi>();
   const [activeThumb, setActiveThumb] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-
-  const onThumbClick = (index: number) => {
-    if (!mainApi || !thumbApi) return;
-    mainApi.scrollTo(index);
-  };
+  const [quantity, setQuantity] = useState<number>(1);
+  const [hovering, setHovering] = useState(false);
 
   React.useEffect(() => {
     if (!mainApi || !thumbApi) return;
-
     const onSelect = () => {
       const selected = mainApi.selectedScrollSnap();
       setActiveThumb(selected);
 
-      // Only scroll thumbnails if the active one isn't recently visible
       const inView = thumbApi.slidesInView();
       if (!inView.includes(selected)) {
         thumbApi.scrollTo(selected);
@@ -88,7 +62,124 @@ const ProductDetail = ({ productId }: { productId: string }) => {
     return () => {
       mainApi.off("select", onSelect);
     };
-  }, [mainApi, thumbApi]);
+  }, [mainApi, thumbApi, setQuantity]);
+
+  // ========================= Data Fetching ========================= \\
+  const {
+    data: productDetail,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useProductHooks.GetDetail({
+    product_id: productId,
+    acno: acno,
+  });
+
+  // ========================= Handlers ========================= \\
+  const onThumbClick = (index: number) => {
+    if (!mainApi || !thumbApi) return;
+    mainApi.scrollTo(index);
+  };
+
+  const handleAttributeSelection = (attrName: string, value: string | null) => {
+    setSelectedAttributes((prev) => {
+      const updatedAttributes = { ...prev };
+
+      if (!value) {
+        delete updatedAttributes[attrName];
+      } else {
+        updatedAttributes[attrName] = value;
+      }
+
+      return updatedAttributes;
+    });
+  };
+
+  const isPartialMatch = (
+    variation: ProductVariation,
+    selectedAttributes: Record<string, string>,
+  ) => {
+    return Object.entries(selectedAttributes).every(
+      ([key, value]) => variation.combination[key] === value,
+    );
+  };
+
+  const selectedVariation = productDetail?.payload.variations.find((v) =>
+    isPartialMatch(v, selectedAttributes),
+  );
+
+  const isOptionAvailable = (attrName: string, optionValue: string) => {
+    return productDetail?.payload.variations.some((v) =>
+      isPartialMatch(v, {
+        ...selectedAttributes,
+        [attrName]: optionValue,
+      }),
+    );
+  };
+
+  const isSimpleProduct =
+    !productDetail?.payload.attributes.length &&
+    !productDetail?.payload.variations.length;
+
+  const getStock = (variation: ProductVariation) => {
+    return variation.inventory.reduce(
+      (total: number, inv: ProductInventory) => {
+        return total + inv.quantity;
+      },
+      0,
+    );
+  };
+
+  const getDefaultStock = () => {
+    return (
+      productDetail?.payload.default_inventory.reduce(
+        (total: number, inv: ProductInventory) => total + inv.quantity,
+        0,
+      ) || 0
+    );
+  };
+
+  const stock = isSimpleProduct
+    ? getDefaultStock()
+    : selectedVariation
+      ? getStock(selectedVariation)
+      : 0;
+
+  useEffect(() => {
+    if (isSimpleProduct) {
+      if (stock === 0) {
+        setQuantity(0);
+      } else if (quantity > stock) {
+        setQuantity(stock);
+      } else if (quantity === 0) {
+        setQuantity(1);
+      }
+      return;
+    }
+
+    if (!selectedVariation) {
+      setQuantity(1);
+      return;
+    }
+
+    if (stock === 0) {
+      setQuantity(0);
+    } else if (quantity > stock) {
+      setQuantity(stock);
+    } else if (quantity === 0) {
+      setQuantity(1);
+    }
+  }, [selectedVariation, stock, isSimpleProduct]);
+
+  // ========================= Render ========================= \\
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
+  }
+
+  if (isError) {
+    return <ErrorState onRetry={refetch} message={error?.message} />;
+  }
 
   return (
     <>
@@ -102,15 +193,14 @@ const ProductDetail = ({ productId }: { productId: string }) => {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage className="font-medium truncate md:max-w-full max-w-[200px]">
-              {product.name}
+              {productDetail?.payload.product_name}
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         <div className="lg:col-span-7 xl:col-span-6 xl:max-w-[650px] w-full flex flex-col sm:flex-row gap-4 sm:gap-6">
-          {/* Main Carousel (Thumbnails) */}
           <div className="order-2 sm:order-1 shrink-0 sm:w-24">
             <Carousel
               setApi={setThumbApi}
@@ -122,51 +212,66 @@ const ProductDetail = ({ productId }: { productId: string }) => {
                 dragFree: true,
               }}
             >
-              <CarouselContent 
+              <CarouselContent
                 viewportClassName="max-h-[361px] lg:max-h-[427px]"
                 className="flex-row sm:flex-col gap-2.5 ml-0 mt-0"
               >
-                {product.images.map((img, idx) => (
-                  <CarouselItem key={idx} className="pt-0 pl-0 basis-auto shrink-0">
-                    <button
-                      onClick={() => onThumbClick(idx)}
-                      className={cn(
-                        "relative aspect-square w-20 sm:w-full rounded-xl overflow-hidden bg-card border-2 transition-all cursor-pointer",
-                        activeThumb === idx ? "border-primary" : "border-transparent",
-                      )}
-                    >
-                      <ImageFallback
-                        src={img}
-                        alt={`Thumbnail ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                        fallbackSrc="https://placehold.co/100x100/F6F6F6/474747/png?text=Preview"
-                      />
-                    </button>
-                  </CarouselItem>
-                ))}
+                <CarouselItem className="pt-0 pl-0 basis-auto shrink-0">
+                  <button
+                    onClick={() => onThumbClick(0)}
+                    className={cn(
+                      "relative aspect-square w-20 sm:w-full rounded-xl overflow-hidden bg-card border-2 transition-all cursor-pointer",
+                      activeThumb === 0
+                        ? "border-primary"
+                        : "border-transparent",
+                    )}
+                  >
+                    <ImageFallback
+                      src={
+                        process.env.NEXT_PUBLIC_API_BASE_URL_GET_ORIO +
+                        "/uploads/" +
+                        acno +
+                        "/" +
+                        productDetail?.payload.default_image!
+                      }
+                      alt={`Thumbnail ${0 + 1}`}
+                      fill
+                      className="object-cover"
+                      fallbackSrc="https://placehold.co/100x100/F6F6F6/474747/png?text=Not+Found"
+                    />
+                  </button>
+                </CarouselItem>
               </CarouselContent>
             </Carousel>
           </div>
 
-          <div className="order-1 sm:order-2 flex-1 relative bg-card rounded-3xl overflow-hidden aspect-square sm:aspect-auto max-h-[361px] lg:max-h-[427px]">
-            <Carousel setApi={setMainApi} className="w-full h-full">
-              <CarouselContent className="h-full ml-0">
-                {product.images.map((img, idx) => (
-                  <CarouselItem key={idx} className="pl-0 h-full">
-                    <div className="relative w-full h-full">
+          <div className="order-1 sm:order-2 flex-1 relative bg-card rounded-3xl overflow-hidden aspect-square sm:aspect-auto h-[361px] lg:h-[427px]">
+            <Carousel
+              setApi={setMainApi}
+              className="w-full h-full [&>.overflow-hidden]:w-full [&>.overflow-hidden]:h-full cursor-zoom-in"
+            >
+              <CarouselContent className="w-full h-full ml-0">
+                <CarouselItem className="pl-0 h-full">
+                  <div className="relative w-full h-full *:w-full *:h-full">
+                    <Lens hovering={hovering} setHovering={setHovering}>
                       <ImageFallback
-                        src={img}
-                        alt={product.name}
+                        src={
+                          process.env.NEXT_PUBLIC_API_BASE_URL_GET_ORIO +
+                          "/uploads/" +
+                          acno +
+                          "/" +
+                          productDetail?.payload.default_image!
+                        }
+                        alt={productDetail?.payload.product_name!}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                         fallbackSrc="https://placehold.co/600x600/F6F6F6/474747/png?text=Not+Found"
                       />
-                    </div>
-                  </CarouselItem>
-                ))}
+                    </Lens>
+                  </div>
+                </CarouselItem>
               </CarouselContent>
-              <CarouselPrevious className="left-4 border-none bg-background hover:bg-background size-10 translate-y-0!">
+              {/* <CarouselPrevious className="left-4 border-none bg-background hover:bg-background size-10 translate-y-0!">
                 <svg
                   width="14"
                   height="21"
@@ -199,40 +304,43 @@ const ProductDetail = ({ productId }: { productId: string }) => {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </CarouselNext>
+              </CarouselNext> */}
             </Carousel>
           </div>
         </div>
 
-        <motion.div
-          className="lg:col-span-5 xl:col-span-6 xl:max-w-[500px] w-full"
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-        >
+        <div className="lg:col-span-5 xl:col-span-6 xl:max-w-[500px] w-full">
           <div className="mb-4">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-4">
-              {product.name}
+              {productDetail?.payload.product_name}
             </h1>
             <p className="text-xl sm:text-2xl text-muted-foreground">
-              Rs.{" "}
-              {product.price.toLocaleString("en-PK", {
-                minimumFractionDigits: 2,
-              })}
+              {isSimpleProduct
+                ? formattedAmount(Number(productDetail?.payload.default_price))
+                : selectedVariation
+                  ? formattedAmount(Number(selectedVariation.price))
+                  : formattedAmount(Number(productDetail?.payload.default_price))}
             </p>
           </div>
 
           <div className="flex items-center gap-2 text-base mb-4">
-            <span className="font-medium text-foreground">Store Name:</span>
-            <span className="text-muted-foreground">{product.store}</span>
+            <span className="font-semibold text-foreground">Store Name:</span>
+            <span className="text-muted-foreground">
+              {productDetail?.payload.business_name}
+            </span>
           </div>
 
-          <div className="flex items-center justify-between max-w-36 xs:px-2 py-1 w-full mb-8">
+          <div className="flex items-center justify-between max-w-36 xs:px-2 py-1 w-full mb-4">
             <Button
               variant="ghost"
               size="icon"
               className="p-4 size-10 rounded-full bg-card hover:bg-card text-foreground hover:text-foreground [&_svg:not([class*='size-'])]:size-5"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={
+                isSimpleProduct
+                  ? stock === 0 || quantity <= 1
+                  : !selectedVariation || stock === 0 || quantity <= 1
+              }
+              onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
             >
               <svg
                 width="15"
@@ -256,7 +364,12 @@ const ProductDetail = ({ productId }: { productId: string }) => {
               variant="ghost"
               size="icon"
               className="p-4 size-10 rounded-full bg-card hover:bg-card text-foreground hover:text-foreground [&_svg:not([class*='size-'])]:size-5"
-              onClick={() => setQuantity(quantity + 1)}
+              disabled={
+                isSimpleProduct
+                  ? stock === 0 || quantity >= stock
+                  : !selectedVariation || stock === 0 || quantity >= stock
+              }
+              onClick={() => setQuantity((prev) => Math.min(prev + 1, stock))}
             >
               <svg
                 width="18"
@@ -281,27 +394,73 @@ const ProductDetail = ({ productId }: { productId: string }) => {
             </Button>
           </div>
 
+          {productDetail?.payload.attributes &&
+            productDetail.payload.attributes.length > 0 && (
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {productDetail.payload.attributes.map((attr) => (
+                  <FloatingSelect
+                    key={attr.name}
+                    label={attr.name}
+                    options={attr.options.map((opt) => ({
+                      value: opt,
+                      label: opt,
+                      isDisabled: !isOptionAvailable(attr.name, opt),
+                    }))}
+                    value={
+                      selectedAttributes[attr.name]
+                        ? {
+                            value: selectedAttributes[attr.name],
+                            label: selectedAttributes[attr.name],
+                          }
+                        : null
+                    }
+                    onChange={(val) => {
+                      const opt = val as {
+                        value: string;
+                        label: string;
+                      };
+                      handleAttributeSelection(attr.name, opt?.value || null);
+                    }}
+                    isSearchable
+                    isClearable
+                  />
+                ))}
+              </div>
+            )}
+
           <div className="space-y-4 sm:max-w-[400px] mb-4">
             <Button
               variant="secondary"
               size="xl"
-              className="w-full rounded-2xl text-base font-semibold "
+              className="w-full rounded-2xl text-base font-semibold"
+              disabled={stock === 0}
             >
               Add to Cart
             </Button>
             <Button
               size="xl"
-              className="w-full rounded-2xl text-base font-semibold "
+              className="w-full rounded-2xl text-base font-semibold"
+              asChild
             >
-              Buy Now
+              <Link href={PUBLIC_ROUTES.CART}>Buy Now</Link>
             </Button>
           </div>
 
           <div className="flex items-center gap-2 text-base">
             <span className="font-semibold">Availability:</span>
-            <span className="text-foreground">{product.availability}</span>
+            <span className="text-foreground">
+              {isSimpleProduct
+                ? stock > 0
+                  ? "In Stock"
+                  : "Out of Stock"
+                : selectedVariation
+                  ? stock > 0
+                    ? "In Stock"
+                    : "Out of Stock"
+                  : "Select options"}
+            </span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </>
   );

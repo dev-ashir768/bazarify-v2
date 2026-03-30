@@ -7,7 +7,14 @@ const Navbar = () => {
     <>
       <nav className="container absolute top-0 left-0 right-0 w-full z-50 flex items-center justify-between py-4">
         <Link href="/">
-          <Image src="/images/logo.svg" alt="Logo" width={150} height={90} />
+          <Image
+            src="/images/logo.svg"
+            alt="Logo"
+            width={150}
+            height={90}
+            loading="eager"
+            priority
+          />
         </Link>
         <div>
           <Button

@@ -9,19 +9,19 @@ const ProductCard = ({
   product_name,
   price,
   sale_price,
-  inventory_policy,
   image,
   on_sale,
-  product_weight,
   sku_code,
-  type,
   business_name,
 }: ProductListResponse["payload"][0]) => {
   return (
     <>
       <div className="flex flex-col gap-3">
         <Link
-          href={PUBLIC_ROUTES.PRODUCTS.replaceAll(":id", id)}
+          href={PUBLIC_ROUTES.PRODUCTS.replaceAll(":id", id).replaceAll(
+            ":acno",
+            acno,
+          )}
           className="relative w-full aspect-square bg-card rounded-2xl overflow-hidden"
         >
           <ImageFallback
@@ -30,7 +30,15 @@ const ProductCard = ({
             fill
             className="object-cover"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
-            src={process.env.NEXT_PUBLIC_API_BASE_URL_GET_ORIO + "/uploads/" + acno + "/" + image}
+            src={
+              image?.startsWith("http")
+                ? image
+                : process.env.NEXT_PUBLIC_API_BASE_URL_GET_ORIO +
+                  "/uploads/" +
+                  acno +
+                  "/" +
+                  image
+            }
             fallbackSrc={
               "https://placehold.co/251x251/F6F6F6/474747/png?text=Not+Found"
             }

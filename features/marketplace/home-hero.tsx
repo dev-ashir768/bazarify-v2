@@ -3,6 +3,7 @@
 import { motion, Variants } from "framer-motion";
 import MainSearch from "../category-filter/main-search";
 
+// ========================= Motion ========================= \\
 const containerVariant: Variants = {
   hidden: { opacity: 0 },
   visible: {

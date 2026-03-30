@@ -12,16 +12,14 @@ const cityOptions = [
 const CartShippingDetails = () => {
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold">
-        Shipping Details
-      </h2>
+      <h2 className="text-xl font-semibold">Shipping Details</h2>
       <div className="flex flex-col gap-6 mt-6">
         <FloatingInput label="First Name" inputSize="lg" />
         <FloatingInput label="Last Name" inputSize="lg" />
         <FloatingInput label="Email" type="email" inputSize="lg" />
         <FloatingInput label="Mobile Number" type="tel" inputSize="lg" />
 
-        <FloatingSelect 
+        <FloatingSelect
           label="City"
           options={cityOptions}
           isSearchable

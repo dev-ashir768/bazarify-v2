@@ -6,8 +6,7 @@ import ProductCard from "../products/product-card";
 import HomeHero from "./home-hero";
 import { useProductHooks } from "@/hooks/useProductHooks";
 import { ErrorState } from "@/components/shared/error-state";
-import { RiAlertLine, RiLoader4Line } from "@remixicon/react";
-import { Button } from "@/components/ui/button";
+import { RiLoader4Line } from "@remixicon/react";
 import { useSearchParams } from "next/navigation";
 import { useCategoryHooks } from "@/hooks/useCategoryHooks";
 import { GetProductsListParams } from "@/types";
@@ -26,7 +25,7 @@ const HomeWrapper = () => {
     isLoading: categoriesLoading,
     isError: categoriesIsError,
     refetch: categoriesRefetch,
-  } = useCategoryHooks.getList();
+  } = useCategoryHooks.GetList();
 
   const categoryId = categories?.payload?.find(
     (item) => item.name.toLowerCase() === category?.toLowerCase(),
@@ -46,7 +45,7 @@ const HomeWrapper = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useProductHooks.GetInfiniteList(data);
+  } = useProductHooks.GetList(data);
 
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -67,13 +66,14 @@ const HomeWrapper = () => {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+
   const allProducts = products?.pages.flatMap((page) => page.payload) || [];
 
   // ========================= Price Bounds ========================= \\
   const productPrices =
     allProducts
-      ?.map((p: any) => Number(p.on_sale === "Y" ? p.sale_price : p.price))
-      .filter((p: any) => !isNaN(p)) || [];
+      ?.map((p) => Number(p.on_sale === "Y" ? p.sale_price : p.price))
+      .filter((p) => !isNaN(p)) || [];
 
   const minBound = productPrices.length > 0 ? Math.min(...productPrices) : 0;
   const maxBound =

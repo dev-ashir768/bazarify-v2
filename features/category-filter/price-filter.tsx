@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface PriceFilterProps {
   minBound: number;
@@ -19,22 +19,15 @@ interface PriceFilterProps {
 
 const PriceFilter = ({ minBound, maxBound }: PriceFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [values, setValues] = useState([minBound, maxBound]);
   const searchParams = useSearchParams();
-  
-  useEffect(() => {
+  const [values, setValues] = useState(() => {
     const minParam = searchParams.get("minPrice");
     const maxParam = searchParams.get("maxPrice");
-
-    if (minParam !== null || maxParam !== null) {
-      setValues([
-        minParam !== null ? Number(minParam) : minBound,
-        maxParam !== null ? Number(maxParam) : maxBound,
-      ]);
-    } else {
-      setValues([minBound, maxBound]);
-    }
-  }, [searchParams, minBound, maxBound]);
+    return [
+      minParam !== null ? Number(minParam) : minBound,
+      maxParam !== null ? Number(maxParam) : maxBound,
+    ];
+  });
   const router = useRouter();
   const pathname = usePathname();
 

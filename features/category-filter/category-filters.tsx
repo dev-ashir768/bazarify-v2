@@ -27,7 +27,7 @@ const CategoryFilters = ({ minBound, maxBound }: CategoryFiltersProps) => {
     isLoading,
     isError,
     refetch,
-  } = useCategoryHooks.getList();
+  } = useCategoryHooks.GetList();
 
   // ========================= Handler ========================= \\
   const handleFilter = useCallback(
@@ -83,7 +83,11 @@ const CategoryFilters = ({ minBound, maxBound }: CategoryFiltersProps) => {
           );
         })}
         <div>
-          <PriceFilter minBound={minBound} maxBound={maxBound} />
+          <PriceFilter
+            key={`${activeCategory}-${searchParams.get("minPrice")}-${searchParams.get("maxPrice")}`}
+            minBound={minBound}
+            maxBound={maxBound}
+          />
         </div>
       </div>
     </div>
