@@ -14,22 +14,22 @@ const ProductCard = ({
   sku_code,
   business_name,
 }: ProductListResponse["payload"][0]) => {
+  const productHref = PUBLIC_ROUTES.PRODUCTS.replace(":id", id).replace(
+    ":acno",
+    acno,
+  );
   return (
     <>
       <div className="flex flex-col gap-3">
         <Link
-          href={PUBLIC_ROUTES.PRODUCTS.replaceAll(":id", id).replaceAll(
-            ":acno",
-            acno,
-          )}
+          href={productHref}
           className="relative w-full aspect-square bg-card rounded-2xl overflow-hidden"
         >
           <ImageFallback
             key={sku_code}
             alt={image}
             fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw"
+            className="object-contain transition-transform duration-300 ease-in-out hover:scale-105"
             src={
               image?.startsWith("http")
                 ? image
@@ -42,12 +42,13 @@ const ProductCard = ({
             fallbackSrc={
               "https://placehold.co/251x251/F6F6F6/474747/png?text=Not+Found"
             }
-            unoptimized
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading="eager"
           />
         </Link>
         <div className="px-2">
           <Link
-            href={`/products/${id}`}
+            href={productHref}
             className="text-sm text-muted-foreground mb-1 capitalize line-clamp-2"
           >
             {product_name}

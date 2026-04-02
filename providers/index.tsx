@@ -1,6 +1,7 @@
 import React from "react";
 import { ThemeProvider } from "./theme-provider";
 import QueryProvider from "./query-provider";
+import { Toaster } from "sonner";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -11,6 +12,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     // disableTransitionOnChange
     >
       <QueryProvider>{children}</QueryProvider>
+      <Toaster richColors position="bottom-right" />
     </ThemeProvider>
   );
 };

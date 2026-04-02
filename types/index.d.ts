@@ -38,13 +38,12 @@ export interface GetProductsListParams {
 
 // ========================= Product Detail ========================= \\
 export interface ProductInventory {
-    id: number;
-    location_id: number;
-    quantity: number;
-    default: number;
-    location_name: string;
-  }
-
+  id: number;
+  location_id: number;
+  quantity: number;
+  default: number;
+  location_name: string;
+}
 export interface ProductVariation {
   variation_id: string;
   price: string;

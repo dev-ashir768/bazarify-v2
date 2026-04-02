@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -25,6 +25,9 @@ import ProductDetailSkeleton from "@/components/shared/product-detail-skeleton";
 import { ErrorState } from "@/components/shared/error-state";
 import { Lens } from "@/components/ui/lens";
 import { FloatingSelect } from "@/components/ui/floating-select";
+import { useCartStore } from "@/store/useCartStore";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { ProductInventory, ProductVariation } from "@/types";
 import { formattedAmount } from "@/lib/formated-amount";
 
@@ -96,6 +99,50 @@ const ProductDetail = ({ productId, acno }: ProductDetailProps) => {
     });
   };
 
+  // Router for navigation
+  const router = useRouter();
+
+  // Add to cart handler
+  const handleAddToCart = () => {
+    // Determine which variation (if any) is selected
+    const variation = selectedVariation;
+    const cartItemId = `${productId}__${variation?.variation_id ?? "default"}`;
+    const price = isSimpleProduct
+      ? productDetail?.payload.default_price
+      : variation?.price ?? productDetail?.payload.default_price;
+
+    const variationLabel = variation
+      ? Object.entries(variation.combination)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(" / ")
+      : undefined;
+    const skuCode = variation?.sku_code ?? productDetail?.payload.default_sku_code;
+
+    // Get values safely with fallbacks to avoid lint errors on ! assertions
+    const pPayload = productDetail?.payload;
+    if (!pPayload) return;
+
+    useCartStore.getState().addItem({
+      cartItemId,
+      productId: pPayload.id,
+      acno,
+      productName: pPayload.product_name,
+      image,
+      price: price || pPayload.default_price,
+      variationId: variation?.variation_id,
+      variationLabel,
+      skuCode: skuCode || pPayload.default_sku_code,
+      maxStock: stock,
+      quantity,
+    });
+    toast.success("Added to cart");
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    router.push(PUBLIC_ROUTES.CART);
+  };
+
   const isPartialMatch = (
     variation: ProductVariation,
     selectedAttributes: Record<string, string>,
@@ -117,7 +164,17 @@ const ProductDetail = ({ productId, acno }: ProductDetailProps) => {
       }),
     );
   };
+  // Resolve the full image URL to display for the cart item
+  const resolvedImage = useMemo(() => {
+    const filename = selectedVariation?.variation_image || productDetail?.payload.default_image;
+    
+    if (!filename) {
+      return "https://placehold.co/600x600/F6F6F6/474747/png?text=No+Image";
+    }
 
+    return `${process.env.NEXT_PUBLIC_API_BASE_URL_GET_ORIO}/uploads/${acno}/${filename}`;
+  }, [selectedVariation, productDetail, acno]);
+  const image = resolvedImage;
   const isSimpleProduct =
     !productDetail?.payload.attributes.length &&
     !productDetail?.payload.variations.length;
@@ -170,7 +227,7 @@ const ProductDetail = ({ productId, acno }: ProductDetailProps) => {
     } else if (quantity === 0) {
       setQuantity(1);
     }
-  }, [selectedVariation, stock, isSimpleProduct]);
+  }, [selectedVariation, stock, isSimpleProduct, quantity]);
 
   // ========================= Render ========================= \\
   if (isLoading) {
@@ -232,7 +289,7 @@ const ProductDetail = ({ productId, acno }: ProductDetailProps) => {
                         "/uploads/" +
                         acno +
                         "/" +
-                        productDetail?.payload.default_image!
+                        productDetail?.payload.default_image
                       }
                       alt={`Thumbnail ${0 + 1}`}
                       fill
@@ -260,9 +317,9 @@ const ProductDetail = ({ productId, acno }: ProductDetailProps) => {
                           "/uploads/" +
                           acno +
                           "/" +
-                          productDetail?.payload.default_image!
+                          (productDetail?.payload.default_image || "")
                         }
-                        alt={productDetail?.payload.product_name!}
+                        alt={productDetail?.payload.product_name || "Product Image"}
                         fill
                         className="object-contain"
                         fallbackSrc="https://placehold.co/600x600/F6F6F6/474747/png?text=Not+Found"
@@ -434,15 +491,16 @@ const ProductDetail = ({ productId, acno }: ProductDetailProps) => {
               size="xl"
               className="w-full rounded-2xl text-base font-semibold"
               disabled={stock === 0}
+              onClick={handleAddToCart}
             >
               Add to Cart
             </Button>
             <Button
               size="xl"
               className="w-full rounded-2xl text-base font-semibold"
-              asChild
+              onClick={handleBuyNow}
             >
-              <Link href={PUBLIC_ROUTES.CART}>Buy Now</Link>
+              Buy Now
             </Button>
           </div>
 

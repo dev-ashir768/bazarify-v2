@@ -1,8 +1,22 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useCartStore } from "@/store/useCartStore";
 
 const Navbar = () => {
+  const { totalItems } = useCartStore();
+  const [mounted, setMounted] = useState(false);
+
+  // Fix hydration for persisted store in navbar
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const itemCount = mounted ? totalItems() : 0;
+
   return (
     <>
       <nav className="container absolute top-0 left-0 right-0 w-full z-50 flex items-center justify-between py-4">
@@ -12,6 +26,7 @@ const Navbar = () => {
             alt="Logo"
             width={150}
             height={90}
+            sizes="(max-width: 768px) 100vw, 33vw"
             loading="eager"
             priority
           />
@@ -40,9 +55,11 @@ const Navbar = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="absolute -top-1.5 -right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white border-2 border-background">
-                  3
-                </span>
+                {itemCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white border-2 border-background">
+                    {itemCount}
+                  </span>
+                )}
               </span>
               My Cart
             </Link>

@@ -16,7 +16,8 @@ export const FloatingSelect = ({ label, ...props }: FloatingSelectProps) => {
       ? props.value.length > 0
       : typeof props.value === "string"
         ? props.value.length > 0
-        : typeof props.value === "object" && Object.keys(props.value).length > 0);
+        : typeof props.value === "object" &&
+          Object.keys(props.value).length > 0);
 
   const isFloated = isFocused || hasValue;
 
@@ -33,9 +34,15 @@ export const FloatingSelect = ({ label, ...props }: FloatingSelectProps) => {
       transition:
         "border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out",
       "&:hover": {
-        borderColor: state.isFocused ? "var(--primary)" : "var(--border)",
+        borderColor: state.isDisabled
+          ? "var(--border)"
+          : state.isFocused
+            ? "var(--primary)"
+            : "var(--border)",
       },
-      backgroundColor: "transparent",
+      backgroundColor: state.isDisabled ? "var(--muted)" : "transparent",
+      opacity: state.isDisabled ? 0.6 : 1,
+      cursor: state.isDisabled ? "not-allowed" : "default",
       fontSize: "14px",
     }),
     valueContainer: (provided) => ({
@@ -45,24 +52,25 @@ export const FloatingSelect = ({ label, ...props }: FloatingSelectProps) => {
     indicatorSeparator: () => ({
       display: "none",
     }),
-    dropdownIndicator: (provided) => ({
+    dropdownIndicator: (provided, state) => ({
       ...provided,
       color: "var(--muted-foreground)",
       padding: "8px 16px 8px 8px",
-      cursor: "pointer",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
     }),
-    multiValueLabel: (provided) => ({
+    multiValueLabel: (provided, state) => ({
       ...provided,
       color: "var(--muted-foreground)",
       fontSize: "14px",
       textTransform: "capitalize",
-      cursor: "pointer",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
       whiteSpace: "normal",
     }),
-    multiValueRemove: (provided) => ({
+    multiValueRemove: (provided, state) => ({
       ...provided,
       color: "var(--muted-foreground)",
-      cursor: "pointer",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+      display: state.isDisabled ? "none" : "flex",
       ":hover": {
         backgroundColor: "var(--primary)",
         color: "var(--background)",
@@ -84,18 +92,43 @@ export const FloatingSelect = ({ label, ...props }: FloatingSelectProps) => {
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected
-        ? "var(--primary)"
-        : state.isFocused
-          ? "var(--muted)"
-          : "transparent",
-      color: state.isSelected ? "var(--background)" : "var(--muted-foreground)",
-      cursor: "pointer",
-      "&:active": {
-        backgroundColor: "var(--primary)",
-        color: "var(--background)",
-      },
+      backgroundColor: state.isDisabled
+        ? "transparent"
+        : state.isSelected
+          ? "var(--primary)"
+          : state.isFocused
+            ? "var(--muted)"
+            : "transparent",
+      
+      color: state.isSelected 
+        ? "var(--background)" 
+        : "var(--muted-foreground)",
+      
+      opacity: state.isDisabled ? 0.5 : 1, 
+      
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+      
+      "&:active": state.isDisabled
+        ? {} 
+        : {
+            backgroundColor: "var(--primary)",
+            color: "var(--background)",
+          },
     }),
+    // option: (provided, state) => ({
+    //   ...provided,
+    //   backgroundColor: state.isSelected
+    //     ? "var(--primary)"
+    //     : state.isFocused
+    //       ? "var(--muted)"
+    //       : "transparent",
+    //   color: state.isSelected ? "var(--background)" : "var(--muted-foreground)",
+    //   cursor: "pointer",
+    //   "&:active": {
+    //     backgroundColor: "var(--primary)",
+    //     color: "var(--background)",
+    //   },
+    // }),
     placeholder: (provided) => ({
       ...provided,
       display: "none",
@@ -128,7 +161,13 @@ export const FloatingSelect = ({ label, ...props }: FloatingSelectProps) => {
       <Label
         className={`absolute left-3 bg-background px-2 font-medium z-10 pointer-events-none transition-all duration-200 ${
           isFloated ? "-top-[10px] text-sm" : "top-[16px] text-[14px]"
-        } ${isFocused ? "text-primary" : "text-muted-foreground"}`}
+        } ${
+          props.isDisabled
+            ? "text-muted-foreground opacity-50 bg-transparent"
+            : isFocused
+              ? "text-primary"
+              : "text-muted-foreground"
+        }`}
       >
         {label}
       </Label>
