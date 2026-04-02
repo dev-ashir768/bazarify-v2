@@ -7,7 +7,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCartStore, CartItem as ICartItem } from "@/store/useCartStore";
 import { formattedAmount } from "@/lib/formated-amount";
 import ImageFallback from "@/lib/image-fallback";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { PUBLIC_ROUTES } from "@/lib/constants";
 
@@ -149,6 +148,7 @@ const CartOrderSummary = () => {
 
   // Fix hydration for persisted store
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -191,7 +191,7 @@ const CartOrderSummary = () => {
         </div>
         <h2 className="text-2xl font-bold mb-2">Your Cart is Empty</h2>
         <p className="text-muted-foreground mb-8 max-w-xs">
-          Looks like you haven't added anything to your cart yet.
+          Looks like you haven&apos;t added anything to your cart yet.
         </p>
         <Link href={PUBLIC_ROUTES.HOME}>
           <Button size="xl" className="rounded-2xl px-10">

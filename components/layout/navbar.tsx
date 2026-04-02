@@ -12,6 +12,7 @@ const Navbar = () => {
 
   // Fix hydration for persisted store in navbar
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

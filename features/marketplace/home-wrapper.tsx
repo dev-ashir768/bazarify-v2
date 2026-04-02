@@ -11,7 +11,6 @@ import { useSearchParams } from "next/navigation";
 import { useCategoryHooks } from "@/hooks/useCategoryHooks";
 import { GetProductsListParams } from "@/types";
 import { useEffect, useRef } from "react";
-import { shuffle } from "@/lib/utils";
 
 const HomeWrapper = () => {
   // ========================= URL Params ========================= \\
@@ -68,7 +67,7 @@ const HomeWrapper = () => {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const allProducts = products?.pages.flatMap((page) => page.payload) || [];
-
+  
   // ========================= Price Bounds ========================= \\
   const productPrices =
     allProducts
